@@ -1,35 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useRef, useState } from "react";
+import ProductList from "./components/ProductList";
+import axios from "axios";
 
+interface User {
+  id: number;
+  name: string;
+}
+
+// const connect = () => console.log("Connecting");
+// const disconnect = () => console.log("Disconnecting");
 function App() {
-  const [count, setCount] = useState(0)
+  const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState([]);
+  const [category, setCategory] = useState("");
+  // const ref = useRef<HTMLInputElement>(null);
+
+  // useEffect is used for any action that happens after render of the DOM
+  // Only at top level of component, not inside loops or if statements.
+
+  // useEffect(() => {
+  //   connect();
+  //   // Clean up fetch, executed before connect() call
+  //   return () => disconnect();
+  // });
+
+  useEffect(() => {
+    axios
+      .get<User[]>("https://jsonplaceholder.typicode.com/users")
+      .then((res) => setUsers(res.data))
+      .catch((error) => setError(error.message));
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      {error && <p className="text-danger">{error}</p>}
+      <div className="mb-3">
+        <select
+          className="form-select"
+          onChange={(event) => setCategory(event.target.value)}
+        >
+          <option value=""></option>
+          <option value="Clothing">Clothing</option>
+          <option value="Household">Household</option>
+        </select>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div className="mb-3">
+        <ProductList category={category} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <ul className="list-group">
+        {users.map((user) => (
+          <li key={user.id} className="list-group-item">
+            {user.name}
+          </li>
+        ))}
+      </ul>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
