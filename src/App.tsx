@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+// import { useRef } from "react";
 import ProductList from "./components/ProductList";
 import axios from "axios";
 
@@ -13,7 +14,7 @@ function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState([]);
   const [category, setCategory] = useState("");
-  // const ref = useRef<HTMLInputElement>(null);
+  //  const ref = useRef<HTMLInputElement>(null);
 
   // useEffect is used for any action that happens after render of the DOM
   // Only at top level of component, not inside loops or if statements.
