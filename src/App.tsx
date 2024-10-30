@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 // import { useRef } from "react";
-import ProductList from "./components/ProductList";
-import axios, { AxiosError, CanceledError } from "axios";
-
+// import ProductList from "./components/ProductList";
+import axios, { CanceledError } from "axios";
+// import { AxiosError } from "axios";
 interface User {
   id: number;
   name: string;
@@ -13,7 +13,7 @@ interface User {
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
-  const [category, setCategory] = useState("");
+  // const [category, setCategory] = useState("");
   const [isLoading, setLoading] = useState(false);
   //  const ref = useRef<HTMLInputElement>(null);
 
@@ -76,10 +76,64 @@ function App() {
         setUsers(originalUsers);
       });
   };
+
+  const addUser = () => {
+    const originalUsers = [...users];
+    const newUser = { id: 0, name: "Ric" };
+    setUsers([newUser, ...users]);
+
+    axios
+      .post("https://jsonplaceholder.typicode.com/users", newUser)
+      .then(({ data: savedUser }) => setUsers([savedUser, ...users]))
+      .catch((error) => {
+        setError(error.message);
+        setUsers(originalUsers);
+      });
+  };
+
+  const updateUser = (user: User) => {
+    const originalUsers = [...users];
+    const updatedUser = { ...user, name: user.name + "!" };
+    setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
+
+    axios
+      .put("https://jsonplaceholder.typicode.com/users/" + user.id, updatedUser)
+      .catch((error) => {
+        setError(error.message);
+        setUsers(originalUsers);
+      });
+  };
   return (
     <>
       {error && <p className="text-danger">{error}</p>}
       {isLoading && <div className="spinner-border"></div>}
+      <button className="btn btn-primary mb-3" onClick={addUser}>
+        Add
+      </button>
+      <ul className="list-group">
+        {users.map((user) => (
+          <li
+            key={user.id}
+            className="list-group-item d-flex justify-content-between"
+          >
+            {user.name}
+            <div>
+              <button
+                className="btn btn-outline-secondary mx-1"
+                onClick={() => updateUser(user)}
+              >
+                Update
+              </button>
+              <button
+                className="btn btn-outline-danger"
+                onClick={() => deleteUser(user)}
+              >
+                Delete
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
       {/* <div className="mb-3">
         <select
           className="form-select"
@@ -93,22 +147,6 @@ function App() {
       <div className="mb-3">
         <ProductList category={category} />
       </div> */}
-      <ul className="list-group">
-        {users.map((user) => (
-          <li
-            key={user.id}
-            className="list-group-item d-flex justify-content-between"
-          >
-            {user.name}
-            <button
-              className="btn btn-outline-danger"
-              onClick={() => deleteUser(user)}
-            >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
     </>
   );
 }
