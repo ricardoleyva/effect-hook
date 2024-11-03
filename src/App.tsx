@@ -1,17 +1,14 @@
-import { useEffect, useState } from "react";
 // import { useRef } from "react";
 // import ProductList from "./components/ProductList";
-import { CanceledError } from "./services/api-client";
 import userService, { User } from "./services/user-service";
+import useUsers from "./hooks/useUsers";
 // import { AxiosError } from "axios";
 
 // const connect = () => console.log("Connecting");
 // const disconnect = () => console.log("Disconnecting");
 function App() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [error, setError] = useState("");
+  const { users, error, isLoading, setUsers, setError } = useUsers();
   // const [category, setCategory] = useState("");
-  const [isLoading, setLoading] = useState(false);
   //  const ref = useRef<HTMLInputElement>(null);
 
   // useEffect is used for any action that happens after render of the DOM
@@ -22,27 +19,6 @@ function App() {
   //   // Clean up fetch, executed before connect() call
   //   return () => disconnect();
   // });
-
-  useEffect(() => {
-    setLoading(true);
-    const { request, cancel } = userService.getAll<User>();
-    // get -> promise -> response or error
-    request
-      .then((res) => {
-        setUsers(res.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        if (error instanceof CanceledError) return;
-        setError(error.message);
-        setLoading(false);
-      });
-    // .finally(() => {
-    //   setLoading(false);
-    // });
-
-    return () => cancel();
-  }, []);
 
   // Same useEffect but using async await instead
   // useEffect(() => {
